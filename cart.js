@@ -6,6 +6,9 @@ if (document.readyState == "loading") {
 }
 //Program ready to execute while page is loading
 function ready() {
+  // start with a clean cart
+  cleanCart();
+
   var removeCartItemButtons = document.getElementsByClassName("btn-danger");
   for (var i = 0; i < removeCartItemButtons.length; i++) {
     var button = removeCartItemButtons[i];
@@ -30,6 +33,7 @@ function ready() {
     .addEventListener("click", purchaseClicked);
 }
 
+//Purchased clicked alerts and removes items by checking if there are any elements within cartItems
 function purchaseClicked() {
   alert("Thank you for your purchase");
   var cartItems = document.getElementsByClassName("cart-items")[0];
@@ -69,9 +73,10 @@ function addItemToCart(title, price, imageSrc) {
   cartRow.classList.add("cart-row");
   var cartItems = document.getElementsByClassName("cart-items")[0];
   var cartItemNames = cartItems.getElementsByClassName("cart-item-title");
-  for (var i = 0; i < cartItemNames.length; i++) {
-    if (cartItemNames[i].innerText == title) {
-      alert("This item is already added to the cart");
+  //iterating cartItemNames with new variable name to check for duplicates
+  for (let name of cartItemNames) {
+    if (name.innerText === title) {
+      alert("This item is already in the cart");
       return;
     }
   }
@@ -95,6 +100,16 @@ function addItemToCart(title, price, imageSrc) {
     .addEventListener("change", quantityChanged);
 }
 
+//Page starts out with a clean cart
+function cleanCart() {
+  var cartItems = document.getElementsByClassName("cart-items")[0];
+  while (cartItems.hasChildNodes()) {
+    cartItems.removeChild(cartItems.firstChild);
+  }
+  updateCartTotal();
+}
+
+// Cart total price gets updated
 function updateCartTotal() {
   var cartItemContainer = document.getElementsByClassName("cart-items")[0];
   var cartRows = cartItemContainer.getElementsByClassName("cart-row");
