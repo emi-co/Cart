@@ -1,18 +1,10 @@
-//Variables
-// var add_bts = document.querySelectorAll("shop-item-button"),
-//   removeCartItemButtons = document.getElementsByClassName("btn-danger"),
-//   quantity_ctn = document.getElementById("cart_quantity_input"),
-//   restBtn = document.getElementById("btn-purchase"),
-//   cartItemContainer = document.getElementsByClassName("cart-items"),
-//   total = 0;
-
-//Makes sure the page is done loading before executing
+//Make sure the page is done loading
 if (document.readyState == "loading") {
   document.addEventListener("DOMContentLoaded", ready);
 } else {
   ready();
 }
-
+//Program ready to execute while page is loading
 function ready() {
   var removeCartItemButtons = document.getElementsByClassName("btn-danger");
   for (var i = 0; i < removeCartItemButtons.length; i++) {
@@ -20,6 +12,7 @@ function ready() {
     button.addEventListener("click", removeCartItem);
   }
 
+  //Grabs the quantity change as a variable to later call the quantityChanged function
   var quantityInputs = document.getElementsByClassName("cart-quantity-input");
   for (var i = 0; i < quantityInputs.length; i++) {
     var input = quantityInputs[i];
@@ -37,7 +30,6 @@ function ready() {
     .addEventListener("click", purchaseClicked);
 }
 
-//Clicking purchase and alert
 function purchaseClicked() {
   alert("Thank you for your purchase");
   var cartItems = document.getElementsByClassName("cart-items")[0];
@@ -47,14 +39,13 @@ function purchaseClicked() {
   updateCartTotal();
 }
 
-//Remove button
 function removeCartItem(event) {
   var buttonClicked = event.target;
   buttonClicked.parentElement.parentElement.remove();
   updateCartTotal();
 }
 
-//update quantity
+//
 function quantityChanged(event) {
   var input = event.target;
   if (isNaN(input.value) || input.value <= 0) {
@@ -63,7 +54,6 @@ function quantityChanged(event) {
   updateCartTotal();
 }
 
-//Adding to Cart
 function addToCartClicked(event) {
   var button = event.target;
   var shopItem = button.parentElement.parentElement;
@@ -74,14 +64,43 @@ function addToCartClicked(event) {
   updateCartTotal();
 }
 
-//Alert if item has already been added
+function addItemToCart(title, price, imageSrc) {
+  var cartRow = document.createElement("div");
+  cartRow.classList.add("cart-row");
+  var cartItems = document.getElementsByClassName("cart-items")[0];
+  var cartItemNames = cartItems.getElementsByClassName("cart-item-title");
+  for (var i = 0; i < cartItemNames.length; i++) {
+    if (cartItemNames[i].innerText == title) {
+      alert("This item is already added to the cart");
+      return;
+    }
+  }
+  var cartRowContents = `
+      <div class="cart-item cart-column">
+          <img class="cart-item-image" src="${imageSrc}" width="100" height="100">
+          <span class="cart-item-title">${title}</span>
+      </div>
+      <span class="cart-price cart-column">${price}</span>
+      <div class="cart-quantity cart-column">
+          <input class="cart-quantity-input" type="number" value="1">
+          <button class="btn btn-danger" type="button">REMOVE</button>
+      </div>`;
+  cartRow.innerHTML = cartRowContents;
+  cartItems.append(cartRow);
+  cartRow
+    .getElementsByClassName("btn-danger")[0]
+    .addEventListener("click", removeCartItem);
+  cartRow
+    .getElementsByClassName("cart-quantity-input")[0]
+    .addEventListener("change", quantityChanged);
+}
 
-//updateTotal
 function updateCartTotal() {
   var cartItemContainer = document.getElementsByClassName("cart-items")[0];
   var cartRows = cartItemContainer.getElementsByClassName("cart-row");
+  var total = 0;
   for (var i = 0; i < cartRows.length; i++) {
-    var cartRows = cartRows[i];
+    var cartRow = cartRows[i];
     var priceElement = cartRow.getElementsByClassName("cart-price")[0];
     var quantityElement = cartRow.getElementsByClassName(
       "cart-quantity-input"
@@ -90,18 +109,7 @@ function updateCartTotal() {
     var quantity = quantityElement.value;
     total = total + price * quantity;
   }
+  total = Math.round(total * 100) / 100; //Moves the decimal up two places
   document.getElementsByClassName("cart-total-price")[0].innerText =
     "$" + total;
-}
-
-//Purchase (Reset)
-document
-  .querySelector(".btn-purchase")
-  .addEventListener("click", purchaseItems);
-
-function purchaseItems() {
-  alert("Thank you for shopping with us");
-  let cartItems = document.querySelector(".cart-items");
-  cartItems.innerHTML = "";
-  updateCartTotal();
 }
