@@ -1,84 +1,107 @@
-var add_bts = document.querySelectorAll("shop-item-button"),
-quantity_ctn = document.getElementById("cart_quantity_input")
-quantity = 0; 
+//Variables
+// var add_bts = document.querySelectorAll("shop-item-button"),
+//   removeCartItemButtons = document.getElementsByClassName("btn-danger"),
+//   quantity_ctn = document.getElementById("cart_quantity_input"),
+//   restBtn = document.getElementById("btn-purchase"),
+//   cartItemContainer = document.getElementsByClassName("cart-items"),
+//   total = 0;
 
+//Makes sure the page is done loading before executing
+if (document.readyState == "loading") {
+  document.addEventListener("DOMContentLoaded", ready);
+} else {
+  ready();
+}
 
-const products = [
+function ready() {
+  var removeCartItemButtons = document.getElementsByClassName("btn-danger");
+  for (var i = 0; i < removeCartItemButtons.length; i++) {
+    var button = removeCartItemButtons[i];
+    button.addEventListener("click", removeCartItem);
+  }
 
-    {
-        value = 1,
-        name:"Album 1",
-        price: 12.99,
-    }, 
+  var quantityInputs = document.getElementsByClassName("cart-quantity-input");
+  for (var i = 0; i < quantityInputs.length; i++) {
+    var input = quantityInputs[i];
+    input.addEventListener("change", quantityChanged);
+  }
 
-    {
-        value = 2,
-        name:"Album 2",
-        price: 14.99
-    },  
+  var addToCartButtons = document.getElementsByClassName("shop-item-button");
+  for (var i = 0; i < addToCartButtons.length; i++) {
+    var button = addToCartButtons[i];
+    button.addEventListener("click", addToCartClicked);
+  }
 
+  document
+    .getElementsByClassName("btn-purchase")[0]
+    .addEventListener("click", purchaseClicked);
+}
 
-    {
-        value = 3,
-        name:"Album 3",
-        price: 9.99,
-  
-    }, 
+//Clicking purchase and alert
+function purchaseClicked() {
+  alert("Thank you for your purchase");
+  var cartItems = document.getElementsByClassName("cart-items")[0];
+  while (cartItems.hasChildNodes()) {
+    cartItems.removeChild(cartItems.firstChild);
+  }
+  updateCartTotal();
+}
 
-    {
-        value = 4,
-        name:"Album 4",
-        price: 19.99,
-    
-    }, 
+//Remove button
+function removeCartItem(event) {
+  var buttonClicked = event.target;
+  buttonClicked.parentElement.parentElement.remove();
+  updateCartTotal();
+}
 
-    {
-        value = 1,
-        name:"t-shirt",
-        price: 19.99,
-      
-    }, 
+//update quantity
+function quantityChanged(event) {
+  var input = event.target;
+  if (isNaN(input.value) || input.value <= 0) {
+    input.value = 1;
+  }
+  updateCartTotal();
+}
 
-    {
-        value = 1,
-        name:"t-shirt",
-        price: 19.99,
-       
-    } 
+//Adding to Cart
+function addToCartClicked(event) {
+  var button = event.target;
+  var shopItem = button.parentElement.parentElement;
+  var title = shopItem.getElementsByClassName("shop-item-title")[0].innerText;
+  var price = shopItem.getElementsByClassName("shop-item-price")[0].innerText;
+  var imageSrc = shopItem.getElementsByClassName("shop-item-image")[0].src;
+  addItemToCart(title, price, imageSrc);
+  updateCartTotal();
+}
 
-];
+//Alert if item has already been added
 
-products.forEach(
-    ({ name, value, price, }) => {
-      shop-item.innerHTML += `
-        <div class="shop-item">
-          <h2>${name}</h2>
-          <span class="shop-item-price">$${price}</span>
-          <button 
-            id="${id}" 
-            class="shop-item-button">Add to cart
-          </button>
-        </div>
-      `;
-    }
-  );
+//updateTotal
+function updateCartTotal() {
+  var cartItemContainer = document.getElementsByClassName("cart-items")[0];
+  var cartRows = cartItemContainer.getElementsByClassName("cart-row");
+  for (var i = 0; i < cartRows.length; i++) {
+    var cartRows = cartRows[i];
+    var priceElement = cartRow.getElementsByClassName("cart-price")[0];
+    var quantityElement = cartRow.getElementsByClassName(
+      "cart-quantity-input"
+    )[0];
+    var price = parseFloat(priceElement.innerText.replace("$", ""));
+    var quantity = quantityElement.value;
+    total = total + price * quantity;
+  }
+  document.getElementsByClassName("cart-total-price")[0].innerText =
+    "$" + total;
+}
 
-//Add to Cart
+//Purchase (Reset)
+document
+  .querySelector(".btn-purchase")
+  .addEventListener("click", purchaseItems);
 
-
-
-//Remove from Cart
-
-
-//Test SSH Key
-
-
-
-{/* <img class="cart-item-image" src="Images/Shirt.png" width="100" height="100">
-<span class="cart-item-title">T-Shirt</span>
-</div>
-<span class="cart-price cart-column">$19.99</span>
-<div class="cart-quantity cart-column">
-<input class="cart-quantity-input" type="number" value="1">
-<button class="btn btn-danger" type="button">REMOVE</button>
-</div> */}
+function purchaseItems() {
+  alert("Thank you for shopping with us");
+  let cartItems = document.querySelector(".cart-items");
+  cartItems.innerHTML = "";
+  updateCartTotal();
+}
